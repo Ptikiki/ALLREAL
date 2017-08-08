@@ -50,6 +50,9 @@ module.exports = {
       fs: 'empty'
     },
     plugins: [
+        new webpack.ProvidePlugin({
+            THREE: "three"
+        }),
         new ExtractTextPlugin({
             filename: 'stylesheet/main.css',
             allChunks: true,
