@@ -1,18 +1,20 @@
+import CSS3DRenderer from './CSS3DRenderer.class.js'
+
 class Renderer {
 
     constructor(options) {
-      this.renderer = new THREE.WebGLRenderer(window.innerWidth, window.innerHeight)
-      //this.stage = new PIXI.Container()
-
+      //this.renderer = new THREE.WebGLRenderer(window.innerWidth, window.innerHeight)
+      
+      new CSS3DRenderer()
+      this.renderer = new THREE.CSS3DRenderer()
+      this.renderer.setSize( window.innerWidth, window.innerHeight )
       STORAGE.renderer = this.renderer
-      //STORAGE.stage = this.stage
 
       this.init()
     }
 
     init() {
-      this.renderer.backgroundColor = 0x000000
-      this.renderer.autoResize = true
+      //this.renderer.autoResize = true
       //this.renderer.view.classList.add('webGLRenderer')
       document.body.appendChild(this.renderer.domElement)
     }

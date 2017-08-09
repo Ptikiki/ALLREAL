@@ -1,24 +1,34 @@
-//const PIXI = require('pixi.js')
 const THREE = require("three-js")()
 
-import Scene from './components/Scene.class.js'
 import Renderer from './components/Renderer.class.js'
-//import Loader from './components/Loader.class.js'
+import Scene from './components/Scene.class.js'
 
 window.STORAGE = {}
 initCanvas()
 
 function initCanvas() {
-  new Scene()
-  new Renderer()
-  // new Loader()
-  // new Menu()
-  // new Carousel({ number: 2 })
+	new Renderer()
+	// new CSS3DRenderer()
+	new Scene()
+	// new Loader()
+	// new Carousel({ number: 2 })
 
-  render()
+ 	render()
 }
 
 function render() {
-  requestAnimationFrame(render)
-  STORAGE.renderer.render(STORAGE.stage)
+	let that = STORAGE.SceneClass
+  	requestAnimationFrame(render)
+
+	that.lon +=  0.1
+	that.lat = Math.max( - 85, Math.min( 85, that.lat ) )
+    that.phi = THREE.Math.degToRad( 90 - that.lat )
+    that.theta = THREE.Math.degToRad( that.lon )
+    that.target.x = Math.sin( that.phi ) * Math.cos( that.theta )
+    that.target.y = Math.cos( that.phi )
+    that.target.z = Math.sin( that.phi ) * Math.sin( that.theta )
+    
+    //STORAGE.camera.lookAt( 10, 10, 10 )
+
+  	STORAGE.renderer.render(STORAGE.scene, STORAGE.camera)
 }
