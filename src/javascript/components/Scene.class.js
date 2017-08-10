@@ -4,16 +4,26 @@ class Scene {
       STORAGE.SceneClass = this
       this.scene = new THREE.Scene()
       STORAGE.scene = this.scene
-      this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 )
+      this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 )
       STORAGE.camera = this.camera
 
       this.geometry, this.material, this.mesh
-      this.target = new THREE.Vector3()
-      this.lon = 90, this.lat = 0
+      this.lon = 0, this.lat = 0
       this.phi = 0, this.theta = 0
-      this.touchX, this.touchY
+
+      this.onPointerDownPointerX
+      this.onPointerDownPointerY
+      this.onPointerDownLon
+      this.onPointerDownLat
+      this.isUserInteracting = false
+      this.onMouseDownMouseX = 0
+      this.onMouseDownMouseY = 0
+      this.onMouseDownLon = 0
+      this.onMouseDownLat = 0
+      this.fov = 70 // Field of View
 
       this.init()
+      this.animate()
       this.bind()
     }
 
@@ -67,8 +77,6 @@ class Scene {
     bind() {
       document.addEventListener( 'mousedown', this.onDocumentMouseDown, false )
       document.addEventListener( 'wheel', this.onDocumentMouseWheel, false )
-      //document.addEventListener( 'touchstart', this.onDocumentTouchStart, false )
-      //document.addEventListener( 'touchmove', this.onDocumentTouchMove, false )
       window.addEventListener( 'resize', this.onWindowResize, false )
     }
 
@@ -81,23 +89,26 @@ class Scene {
     onDocumentMouseDown(event) {
       let that = STORAGE.SceneClass
       event.preventDefault()
+      that.onPointerDownPointerX = event.clientX
+      that.onPointerDownPointerY = event.clientY
+      that.onPointerDownLon = that.lon
+      that.onPointerDownLat = that.lat
+      that.isUserInteracting = true
       document.addEventListener('mousemove', that.onDocumentMouseMove, false)
       document.addEventListener('mouseup', that.onDocumentMouseUp, false)
 
-      STORAGE.camera.lookAt( 10, 0, 10 )
       console.log(STORAGE.camera)
     }
 
     onDocumentMouseMove(event) {
       let that = STORAGE.SceneClass
-      that.movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0
-      that.movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0
-      that.lon -= that.movementX * 0.1
-      that.lat += that.movementY * 0.1
+      that.lon = (event.clientX - that.onPointerDownPointerX) * -0.175 + that.onPointerDownLon
+      that.lat = (event.clientY - that.onPointerDownPointerY) * -0.175 + that.onPointerDownLat
     }
       
     onDocumentMouseUp(event) {
       let that = STORAGE.SceneClass
+      that.isUserInteracting = false
       document.removeEventListener( 'mousemove', that.onDocumentMouseMove )
       document.removeEventListener( 'mouseup', that.onDocumentMouseUp )
     }
@@ -107,34 +118,27 @@ class Scene {
       STORAGE.camera.updateProjectionMatrix()
     }
 
-    onDocumentTouchStart(event) {
-      event.preventDefault()
-      this.touch = event.touches[0]
-      this.touchX = touch.screenX
-      this.touchY = touch.screenY
-    }
-
-    onDocumentTouchMove(event) {
-      console.log("TOUCHMOVE")
-      event.preventDefault()
-      this.touch = event.touches[ 0 ]
-      this.lon -= (this.touch.screenX - this.touchX) * 0.1
-      this.lat += (this.touch.screenY - this.touchY) * 0.1
-      this.touchX = this.touch.screenX
-      this.touchY = this.touch.screenY
-    }
-
     animate() {
-      this.requestAnimationFrame( animate )
-      this.lon +=  0.1
-      this.lat = Math.max( - 85, Math.min( 85, this.lat ) )
-      this.phi = THREE.Math.degToRad( 90 - this.lat )
-      this.theta = THREE.Math.degToRad( this.lon )
-      this.target.x = Math.sin( this.phi ) * Math.cos( this.theta )
-      this.target.y = Math.cos( this.phi )
-      this.target.z = Math.sin( this.phi ) * Math.sin( this.theta )
-      STORAGE.camera.lookAt( this.target )
-      STORAGE.renderer.render( STORAGE.scene, STORAGE.camera )
+      let that = STORAGE.SceneClass
+      requestAnimationFrame( that.animate )
+      that.render()
+    }
+
+    render() {
+      if (this.isUserInteracting === false) {
+        this.lon += .05
+      }
+
+      console.log("LOG")
+      this.lat = Math.max(-85, Math.min(85, this.lat))
+      this.phi = THREE.Math.degToRad(90 - this.lat)
+      this.theta = THREE.Math.degToRad(this.lon)
+      STORAGE.camera.position.x = 100 * Math.sin(this.phi) * Math.cos(this.theta)
+      STORAGE.camera.position.y = 100 * Math.cos(this.phi)
+      STORAGE.camera.position.z = 100 * Math.sin(this.phi) * Math.sin(this.theta)
+    
+      STORAGE.camera.lookAt(STORAGE.scene.position)
+      STORAGE.renderer.render(STORAGE.scene, STORAGE.camera)
     }
 }
 
