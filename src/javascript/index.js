@@ -15,7 +15,7 @@ function initCanvas() {
 	// new Loader()
 	// new Carousel({ number: 2 })
 
- 	render()
+ 	// render()
 }
 
 function render() {

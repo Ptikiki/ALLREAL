@@ -4,78 +4,90 @@ class Scene {
       STORAGE.SceneClass = this
       this.scene = new THREE.Scene()
       STORAGE.scene = this.scene
-      this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 )
+      this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 )
       STORAGE.camera = this.camera
-
-      this.geometry, this.material, this.mesh
-      this.lon = 0, this.lat = 0
-      this.phi = 0, this.theta = 0
-
-      this.onPointerDownPointerX
-      this.onPointerDownPointerY
-      this.onPointerDownLon
-      this.onPointerDownLat
-      this.isUserInteracting = false
-      this.onMouseDownMouseX = 0
-      this.onMouseDownMouseY = 0
-      this.onMouseDownLon = 0
-      this.onMouseDownLat = 0
-      this.fov = 70 // Field of View
+      this.controls = new THREE.OrbitControls( STORAGE.camera )
+      this.controls.target.set( 0, 0, 0 )
 
       this.init()
-      this.animate()
       this.bind()
+      this.animate()
     }
 
     init() {
+      this.createCube()
+      this.createBackground()
+    }
 
-      this.sides = [
-        {
-          url: 'assets/textures/texture1.jpg',
-          position: [ -512, 0, 0 ],
-          rotation: [ 0, Math.PI / 2, 0 ]
-        },
-        {
-          url: 'assets/textures/texture2.jpg',
-          position: [ 512, 0, 0 ],
-          rotation: [ 0, -Math.PI / 2, 0 ]
-        },
-        {
-          url: 'assets/textures/texture3.jpg',
-          position: [ 0,  512, 0 ],
-          rotation: [ Math.PI / 2, 0, Math.PI ]
-        },
-        {
-          url: 'assets/textures/texture4.jpg',
-          position: [ 0, -512, 0 ],
-          rotation: [ - Math.PI / 2, 0, Math.PI ]
-        },
-        {
-          url: 'assets/textures/texture5.jpg',
-          position: [ 0, 0,  512 ],
-          rotation: [ 0, Math.PI, 0 ]
-        },
-        {
-          url: 'assets/textures/texture6.jpg',
-          position: [ 0, 0, -512 ],
-          rotation: [ 0, 0, 0 ]
-        }
-      ]
+    createCube() {
+      this.geometry = new THREE.BoxGeometry( 1, 1, 1 )
+      this.material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
+      this.cube = new THREE.Mesh( this.geometry, this.material )
+      STORAGE.scene.add( this.cube )
+      STORAGE.camera.position.z = 5
+    }
 
-      for ( var i = 0; i < this.sides.length; i ++ ) {
-        this.side = this.sides[i]
-        this.element = document.createElement('img')
-        this.element.width = 1026 // 2 pixels extra to close the gap.
-        this.element.src = this.side.url
-        this.object = new THREE.CSS3DObject(this.element)
-        this.object.position.fromArray(this.side.position)
-        this.object.rotation.fromArray(this.side.rotation)
-        this.scene.add(this.object)
+    createBackground() {
+      let that = this
+      this.geometry = new THREE.SphereGeometry( 500, 60, 40 )
+      this.geometry.scale( - 1, 1, 1 )
+      this.material = new THREE.MeshBasicMaterial( {
+        map: new THREE.TextureLoader().load( 'assets/textures/texture5.jpg' )
+      })
+      this.mesh = new THREE.Mesh( this.geometry, this.material )
+      STORAGE.scene.add( this.mesh )
+      // this.loader = new THREE.TextureLoader()
+      // this.loader.crossOrigin = true
+      // this.loader.load(
+      //   'http://localhost:8080/assets/textures/sun_temple_stripe.jpg',
+      //   function ( texture ) {
+      //     that.textures = that.getTexturesFromAtlasFile( texture, 6 )
+      //     // that.materials = []
+      //     // for ( let i = 0; i < 6; i ++ ) {
+      //     //   that.materials.push( new THREE.MeshBasicMaterial( { map: that.textures[ i ] } ) )
+      //     // }
+      //     // that.skyBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), that.materials )
+      //     // that.skyBox.applyMatrix( new THREE.Matrix4().makeScale( 1, 1, - 1 ) )
+      //     // STORAGE.scene.add( that.skyBox )
+      //   },
+      //   function ( xhr ) {
+      //     console.log( (xhr.loaded / xhr.total * 100) + '% chargé' )
+      //   },
+      //   function ( xhr ) {
+      //     console.log( 'Marche pô' )
+      //   }
+      // )
+    }
+
+    getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
+      let that = this
+      this.textures = []
+      for ( let i = 0; i < tilesNum; i ++ ) {
+        this.textures[ i ] = new THREE.Texture()
       }
+      this.imageObj = new Image()
+      this.imageObj.src = atlasImgUrl
+      this.imageObj.onload = function() {
+        console.log("IMGOBJ", that.imageObj)
+        that.canvas, that.context
+        that.tileWidth = that.imageObj.height
+        for ( let i = 0; i < that.textures.length; i ++ ) {
+          console.log("I", i)
+          that.canvas = document.createElement( 'canvas' )
+          that.context = that.canvas.getContext( '2d' )
+          that.canvas.height = that.tileWidth
+          that.canvas.width = that.tileWidth
+          that.context.drawImage( that.imageObj, that.tileWidth * i, 0, that.tileWidth, that.tileWidth, 0, 0, that.tileWidth, that.tileWidth )
+          that.textures[ i ].image = that.canvas
+          that.textures[ i ].needsUpdate = true
+        }
+        console.log("TEXTURES", that.textures)
+      }
+      console.log("TEXTURES", this.textures)
+      return this.textures
     }
 
     bind() {
-      document.addEventListener( 'mousedown', this.onDocumentMouseDown, false )
       document.addEventListener( 'wheel', this.onDocumentMouseWheel, false )
       window.addEventListener( 'resize', this.onWindowResize, false )
     }
@@ -86,33 +98,6 @@ class Scene {
       STORAGE.renderer.setSize(window.innerWidth, window.innerHeight)
     }
 
-    onDocumentMouseDown(event) {
-      let that = STORAGE.SceneClass
-      event.preventDefault()
-      that.onPointerDownPointerX = event.clientX
-      that.onPointerDownPointerY = event.clientY
-      that.onPointerDownLon = that.lon
-      that.onPointerDownLat = that.lat
-      that.isUserInteracting = true
-      document.addEventListener('mousemove', that.onDocumentMouseMove, false)
-      document.addEventListener('mouseup', that.onDocumentMouseUp, false)
-
-      console.log(STORAGE.camera)
-    }
-
-    onDocumentMouseMove(event) {
-      let that = STORAGE.SceneClass
-      that.lon = (event.clientX - that.onPointerDownPointerX) * -0.175 + that.onPointerDownLon
-      that.lat = (event.clientY - that.onPointerDownPointerY) * -0.175 + that.onPointerDownLat
-    }
-      
-    onDocumentMouseUp(event) {
-      let that = STORAGE.SceneClass
-      that.isUserInteracting = false
-      document.removeEventListener( 'mousemove', that.onDocumentMouseMove )
-      document.removeEventListener( 'mouseup', that.onDocumentMouseUp )
-    }
-
     onDocumentMouseWheel(event) {
       STORAGE.camera.fov += event.deltaY * 0.05
       STORAGE.camera.updateProjectionMatrix()
@@ -120,25 +105,8 @@ class Scene {
 
     animate() {
       let that = STORAGE.SceneClass
-      requestAnimationFrame( that.animate )
-      that.render()
-    }
-
-    render() {
-      if (this.isUserInteracting === false) {
-        this.lon += .05
-      }
-
-      console.log("LOG")
-      this.lat = Math.max(-85, Math.min(85, this.lat))
-      this.phi = THREE.Math.degToRad(90 - this.lat)
-      this.theta = THREE.Math.degToRad(this.lon)
-      STORAGE.camera.position.x = 100 * Math.sin(this.phi) * Math.cos(this.theta)
-      STORAGE.camera.position.y = 100 * Math.cos(this.phi)
-      STORAGE.camera.position.z = 100 * Math.sin(this.phi) * Math.sin(this.theta)
-    
-      STORAGE.camera.lookAt(STORAGE.scene.position)
       STORAGE.renderer.render(STORAGE.scene, STORAGE.camera)
+      requestAnimationFrame( that.animate )
     }
 }
 
