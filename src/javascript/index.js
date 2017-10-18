@@ -4,18 +4,15 @@ OrbitControls(THREE)
 
 import Renderer from './components/Renderer.class.js'
 import Scene from './components/Scene.class.js'
+import Room from './components/Room.class.js'
 
 window.STORAGE = {}
 initCanvas()
 
 function initCanvas() {
 	new Renderer()
-	// new CSS3DRenderer()
-	new Scene()
+	new Room({ number: 1 })
 	// new Loader()
-	// new Carousel({ number: 2 })
-
- 	// render()
 }
 
 function render() {

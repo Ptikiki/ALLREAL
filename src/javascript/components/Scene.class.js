@@ -16,7 +16,8 @@ class Scene {
 
     init() {
       this.createCube()
-      this.createBackground()
+      //this.createBackground()
+      this.createVideoBackground()
     }
 
     createCube() {
@@ -32,7 +33,7 @@ class Scene {
       this.geometry = new THREE.SphereGeometry( 500, 60, 40 )
       this.geometry.scale( - 1, 1, 1 )
       this.material = new THREE.MeshBasicMaterial( {
-        map: new THREE.TextureLoader().load( 'assets/textures/texture5.jpg' )
+        map: new THREE.TextureLoader().load( 'assets/textures/test.jpg' )
       })
       this.mesh = new THREE.Mesh( this.geometry, this.material )
       STORAGE.scene.add( this.mesh )
@@ -85,6 +86,29 @@ class Scene {
       }
       console.log("TEXTURES", this.textures)
       return this.textures
+    }
+
+    createVideoBackground() {
+      // THREE.DefaultLoadingManager.onStart = function ( url, itemsLoaded, itemsTotal ) {
+      //   console.log( 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' )
+      // }
+
+      let that = this
+      this.geometry = new THREE.SphereGeometry( 500, 60, 40 )
+      this.geometry.scale( - 1, 1, 1 )
+      this.video = document.createElement( 'video' )
+      this.video.width = 640
+      this.video.height = 360
+      this.video.autoplay = true
+      this.video.loop = true
+      this.video.src = "assets/videos/video1.mp4"
+      this.texture = new THREE.VideoTexture( this.video )
+      this.texture.minFilter = THREE.LinearFilter
+      this.texture.format = THREE.RGBFormat
+      this.material = new THREE.MeshBasicMaterial( { map : this.texture } )
+      this.mesh = new THREE.Mesh( this.geometry, this.material )
+
+      STORAGE.scene.add( this.mesh )
     }
 
     bind() {
