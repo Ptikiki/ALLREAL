@@ -1,10 +1,13 @@
 import virtualVisitDatas from '../datas/virtualVisitDatas.js'
+import TweenLite from 'gsap'
+
 
 class Room {
 
     constructor(options) {
       STORAGE.RoomClass = this
       this.roomNumber = options.number-1
+      STORAGE.TWEEN = options.tween
       this.scene = new THREE.Scene()
       STORAGE.scene = this.scene
       this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 )
@@ -14,7 +17,11 @@ class Room {
       this.raycaster = new THREE.Raycaster()
       this.mouse = new THREE.Vector2()
 
-      console.log(this.roomNumber+1)
+      STORAGE.page = document.querySelector('html')
+      STORAGE.body = document.querySelector('body')
+
+      console.log("ROOM NUMBER :", this.roomNumber+1)
+
       this.init()
       this.bind()
       this.animate()
@@ -41,8 +48,36 @@ class Room {
       this.material = new THREE.MeshBasicMaterial( { map : this.texture } )
       this.mesh = new THREE.Mesh( this.geometry, this.material )
       this.mesh.name = "background"
-
       STORAGE.scene.add( this.mesh )
+
+      // this.tweenOpacity = new STORAGE.TWEEN.Tween(that.page).to({
+      //   opacity: 1
+      // }, 1000).
+      // onComplete(function(){
+      //   console.log("animation en cours")
+      //   that.material.transparent = false
+      //   that.material.visible = true
+      // })
+      // this.tweenOpacity.start()
+   
+      //that.page.style.opacity = "1"
+      //that.body.style.opacity = "1"
+
+      
+
+      // this.video.addEventListener("canplaythrough", function () {
+      //   console.log(that.video)
+      //   that.video.play()
+      // }, false)
+
+      // this.video.addEventListener("progress", function() {
+      //   if (Math.round(that.video.buffered.end(0)) / Math.round(that.video.seekable.end(0)) === 1) {
+      //     // Entire video is downloaded
+      //     console.log("chargement terminé")
+      //     that.video.play()
+      //   }
+      // }, false)
+
     }
 
     putArrows() {
@@ -71,13 +106,13 @@ class Room {
     bind() {
       document.addEventListener( 'wheel', this.onDocumentMouseWheel, false )
       window.addEventListener( 'resize', this.onWindowResize, false )
-      document.addEventListener( 'mousedown', this.onDocumentMouseDown, false )
+      document.addEventListener( 'mousedown', this.onArrowMouseDown, false )
     }
 
     unbind() {
       document.removeEventListener( 'wheel', this.onDocumentMouseWheel, false )
       window.removeEventListener( 'resize', this.onWindowResize, false )
-      document.removeEventListener( 'mousedown', this.onDocumentMouseDown, false )
+      document.removeEventListener( 'mousedown', this.onArrowMouseDown, false )
     }
 
     onWindowResize() {
@@ -91,7 +126,7 @@ class Room {
       STORAGE.camera.updateProjectionMatrix()
     }
 
-    onDocumentMouseDown(event) {
+    onArrowMouseDown(event) {
       let that = STORAGE.RoomClass
       
       that.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1
@@ -100,18 +135,19 @@ class Room {
       that.intersects = that.raycaster.intersectObjects( STORAGE.scene.children )
       
       // INTERACTION AU CLICK SUR UNE FLECHE ==> CHANGEMENT DE ROOM (DESTRUCTION ET CREATION)
-      for ( let i = 0; i < that.intersects.length; i++ ) 
-        {
-          if (that.intersects[i].object.name == "arrow") {
-            console.log(that.intersects[i].object)
-            STORAGE.RoomClass.unbind()
-            STORAGE.scene = null
-            STORAGE.camera = null
-            that.controls = null
-            that.raycaster = null
-            new Room({ number: that.intersects[i].object.nextRoom })
-          }
+      for ( let i = 0; i < that.intersects.length; i++ ) {
+        if (that.intersects[i].object.name == "arrow") {
+          console.log(that.intersects[i].object)
+          STORAGE.RoomClass.unbind()
+          STORAGE.scene = null
+          STORAGE.camera = null
+          that.controls = null
+          that.raycaster = null
+          //that.page.style.opacity = "0"
+          //that.body.style.opacity = "0"
+          new Room({ number: that.intersects[i].object.nextRoom })
         }
+      }
     }
 
     animate() {

@@ -40,6 +40,23 @@ const virtualVisitDatas = {
       }
       ],
     }
+  ],
+  datasMapPoints: [
+    {
+      x: 1100,
+      y: 360,
+      room: 1
+    },
+    {
+      x: 700,
+      y: 500,
+      room: 2     
+    },
+    {
+      x: 1000,
+      y: 320,
+      room: 3
+    }
   ]
 }
 
