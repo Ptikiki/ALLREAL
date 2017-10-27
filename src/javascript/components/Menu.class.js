@@ -12,6 +12,8 @@ class Menu {
       this.mapState = 0
 
       this.mapPointsArray = []
+      this.mapPointsRatioLeft = []
+      this.mapPointsRatioTop = []
 
       this.init()
       this.bind()
@@ -30,13 +32,20 @@ class Menu {
       let div = document.createElement('div')
       this.a.appendChild(div)
       div.className = 'mapPoint'
-      div.style.left = virtualVisitDatas.datasMapPoints[pointNumber].x+'px'
-      div.style.top = virtualVisitDatas.datasMapPoints[pointNumber].y+'px'
-  
+      div.style.left = virtualVisitDatas.datasMapPoints[pointNumber].x+'%'
+      div.style.top = virtualVisitDatas.datasMapPoints[pointNumber].y+'%'
+      div.style.backgroundColor = virtualVisitDatas.datasMapPoints[pointNumber].color
       let room = virtualVisitDatas.datasMapPoints[pointNumber].room
       div.id = ''+room+''
 
       this.mapPointsArray.push(this.a)
+
+      this.ratioMapPointLeft = div.offsetLeft/window.innerWidth
+      this.mapPointsRatioLeft.push(this.ratioMapPointLeft)
+      this.ratioMapPointTop = div.offsetTop/window.innerHeight
+      this.mapPointsRatioTop.push(this.ratioMapPointTop)
+
+      //console.log("WINDOW WIDTH AT POINT CREATION", window.innerWidth)
     }
 
     putMapPoints() {
@@ -66,7 +75,6 @@ class Menu {
 
     onWindowResize() {
       let that = STORAGE.MenuClass
-      console.log(window.innerWidth)
       if (that.mapState == 0) {
         TweenLite.to(that.map, 1, {
           x: window.innerWidth
@@ -78,11 +86,13 @@ class Menu {
         })
       }
 
-      for (let i = 0; i < that.mapPointsArray.length; i++) {
-        // that.ratioMapPointLeft = 
-        console.log(that.mapPointsArray[i].children[0])
-        that.mapPointsArray[i].children[0].setAttribute("style", "margin-left: 500px")
-      }  
+      // this.mapPointsToResize = document.getElementsByClassName("mapPoint")
+      // console.log(this.mapPointsToResize)
+
+      for (let i = 0; i < that.mapPointsRatioLeft.length; i++) {
+        this.newPointLeft = that.mapPointsRatioLeft[i]*window.innerWidth
+        that.mapPointsArray[i].children[0].setAttribute("style", "left:"+this.newPointLeft+"px; top:"+virtualVisitDatas.datasMapPoints[i].y+"%; background-color:"+virtualVisitDatas.datasMapPoints[i].color+"")
+      }
     }
 
     mapAnimations() {
@@ -108,18 +118,7 @@ class Menu {
       that.room = event.target.id
       console.log(event.target.id)
 
-      if (that.mapState == 0) {
-        TweenLite.to(that.map, 1, {
-          x: -window.innerWidth
-        })
-        that.mapState = 1
-      }
-      else {
-        TweenLite.to(that.map, 1, {
-          x: window.innerWidth
-        })
-        that.mapState = 0
-      }
+      that.mapAnimations()
       
       STORAGE.RoomClass.unbind()
       STORAGE.scene = null

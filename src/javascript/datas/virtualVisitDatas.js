@@ -6,7 +6,7 @@ const virtualVisitDatas = {
         x: 5,
         y: 30,
         nextRoom: 2,
-        color: 0xffffff
+        color: 0x0000ff
       }
       ],
     },
@@ -43,19 +43,22 @@ const virtualVisitDatas = {
   ],
   datasMapPoints: [
     {
-      x: 1100,
-      y: 360,
-      room: 1
+      x: 50,
+      y: 25,
+      room: 1,
+      color: '#0000ff'
     },
     {
-      x: 700,
-      y: 500,
-      room: 2     
+      x: 55,
+      y: 45,
+      room: 2,
+      color: '#00ff00'     
     },
     {
-      x: 1000,
-      y: 320,
-      room: 3
+      x: 30,
+      y: 48,
+      room: 3,
+      color: '#ff0000'
     }
   ]
 }

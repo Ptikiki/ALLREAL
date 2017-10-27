@@ -43,11 +43,13 @@ html, body {
 #js-map img {
   display: block;
   margin: auto;
+  margin-top: 100px;
+  width: 50%;
 }
 
 .mapPoint {
-  width: 20px;
-  height: 20px;
+  width: 1%;
+  height: 2%;
   background-color: blue;
   border-radius: 100%;
   position: absolute;
