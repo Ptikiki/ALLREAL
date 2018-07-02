@@ -1,3 +1,5 @@
+import Shader from '../components/Shader.class.js'
+
 class Ending {
 
     constructor(options) {
@@ -23,6 +25,8 @@ class Ending {
     bind() {
       let that = STORAGE.EndingClass
       window.addEventListener("load", this.initMp3Player(), false)
+
+      // new Shader()
 
       // document.querySelector(".transparent").addEventListener('click', function() {
       //   this.gradient = that.ctx.createLinearGradient(0,0,170,0)
