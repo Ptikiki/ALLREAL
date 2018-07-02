@@ -1,4 +1,5 @@
 import virtualVisitDatas from '../datas/virtualVisitDatas.js'
+import Ending from '../components/Ending.class.js'
 import TweenLite from 'gsap'
 
 
@@ -30,6 +31,7 @@ class Room {
     init() {
       this.createVideoBackground()
       this.putArrows()
+      this.roomNumber === virtualVisitDatas.datasRooms.length - 1 ? this.visitEnding() : ''
     }
 
     createVideoBackground() {
@@ -49,35 +51,6 @@ class Room {
       this.mesh = new THREE.Mesh( this.geometry, this.material )
       this.mesh.name = "background"
       STORAGE.scene.add( this.mesh )
-
-      // this.tweenOpacity = new STORAGE.TWEEN.Tween(that.page).to({
-      //   opacity: 1
-      // }, 1000).
-      // onComplete(function(){
-      //   console.log("animation en cours")
-      //   that.material.transparent = false
-      //   that.material.visible = true
-      // })
-      // this.tweenOpacity.start()
-   
-      //that.page.style.opacity = "1"
-      //that.body.style.opacity = "1"
-
-      
-
-      // this.video.addEventListener("canplaythrough", function () {
-      //   console.log(that.video)
-      //   that.video.play()
-      // }, false)
-
-      // this.video.addEventListener("progress", function() {
-      //   if (Math.round(that.video.buffered.end(0)) / Math.round(that.video.seekable.end(0)) === 1) {
-      //     // Entire video is downloaded
-      //     console.log("chargement terminé")
-      //     that.video.play()
-      //   }
-      // }, false)
-
     }
 
     putArrows() {
@@ -148,6 +121,11 @@ class Room {
           new Room({ number: that.intersects[i].object.nextRoom })
         }
       }
+    }
+
+    visitEnding() { 
+      console.log("visitEnding")
+      new Ending()
     }
 
     animate() {
